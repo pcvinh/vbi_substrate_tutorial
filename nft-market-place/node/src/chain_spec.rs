@@ -1,6 +1,7 @@
-use node_nft-market-place_runtime::{
+use node_nft_market_place_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
 	SystemConfig, WASM_BINARY,
+	SubstrateKittiesConfig,
 };
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -150,6 +151,9 @@ fn testnet_genesis(
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
+		},
+		substrate_kitties: SubstrateKittiesConfig {
+			kitties: vec![],
 		},
 		transaction_payment: Default::default(),
 	}
