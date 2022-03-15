@@ -23,7 +23,7 @@ pub mod pallet {
 		<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 	// Struct for holding Kitty information.
-	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	#[codec(mel_bound())]
 	pub struct Kitty<T: Config> {
@@ -31,7 +31,13 @@ pub mod pallet {
 		pub price: Option<BalanceOf<T>>,
 		pub gender: Gender,
 		pub owner: AccountOf<T>,
+		pub created_time: <T::TimeProvider as frame_support::traits::Time>::Moment,
 	}
+	impl<T: Config> MaxEncodedLen for Kitty<T> {
+        fn max_encoded_len() -> usize {
+            T::AccountId::max_encoded_len() * 2
+        }
+    }
 
 	// Enum declaration for Gender.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
@@ -45,6 +51,7 @@ pub mod pallet {
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(_);
 
+	use frame_support::traits::Time;
 	/// Configure the pallet by specifying the parameters and types it depends on.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -60,6 +67,8 @@ pub mod pallet {
 
 		/// The type of Randomness we want to specify for this pallet.
 		type KittyRandomness: Randomness<Self::Hash, Self::BlockNumber>;
+
+		type TimeProvider: Time;
 	}
 
 	// Errors.
@@ -331,6 +340,7 @@ pub mod pallet {
 				price: None,
 				gender: gender.unwrap_or_else(Self::gen_gender),
 				owner: owner.clone(),
+				created_time: T::TimeProvider::now()
 			};
 
 			let kitty_id = T::Hashing::hash_of(&kitty);
