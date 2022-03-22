@@ -276,6 +276,7 @@ impl pallet_kitties::Config for Runtime {
 	type Currency = Balances; // <-- Add this line
 	type KittyRandomness = RandomnessCollectiveFlip; // <-- ACTION: add this line.
 	type MaxKittyOwned = MaxKittyOwned; // <- add this line
+	type WeightInfo = pallet_kitties::weights::KittiesWeightInfo<Runtime>;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -337,7 +338,7 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
-		[pallet_template, TemplateModule]
+		[pallet_kitties, SubstrateKitties]
 	);
 }
 

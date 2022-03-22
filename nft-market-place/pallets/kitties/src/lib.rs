@@ -2,8 +2,20 @@
 
 pub use pallet::*;
 
+#[cfg(test)]
+mod mock;
+
+#[cfg(test)]
+mod tests;
+
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
+
+pub mod weights;
+
 #[frame_support::pallet]
 pub mod pallet {
+	pub use super::*;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
@@ -17,6 +29,7 @@ pub mod pallet {
 
 	#[cfg(feature = "std")]
 	use frame_support::serde::{Deserialize, Serialize};
+	use weights::WeightInfo;
 
 	type AccountOf<T> = <T as frame_system::Config>::AccountId;
 	type BalanceOf<T> =
@@ -60,6 +73,9 @@ pub mod pallet {
 
 		/// The type of Randomness we want to specify for this pallet.
 		type KittyRandomness: Randomness<Self::Hash, Self::BlockNumber>;
+
+		/// WeightInfo
+		type WeightInfo: WeightInfo;
 	}
 
 	// Errors.
@@ -154,7 +170,7 @@ pub mod pallet {
 		/// Create a new unique kitty.
 		///
 		/// The actual kitty creation is done in the `mint()` function.
-		#[pallet::weight(100)]
+		#[pallet::weight(T::WeightInfo::create_kitty())]
 		pub fn create_kitty(origin: OriginFor<T>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 
